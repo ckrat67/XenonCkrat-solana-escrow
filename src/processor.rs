@@ -1,12 +1,12 @@
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
-    program_error::ProgramError,
     msg,
+    program::{invoke, invoke_signed},
+    program_error::ProgramError,
+    program_pack::{IsInitialized, Pack},
     pubkey::Pubkey,
-    program_pack::{Pack, IsInitialized},
     sysvar::{rent::Rent, Sysvar},
-    program::invoke
 };
 
 use spl_token::state::Account as TokenAccount;
@@ -178,7 +178,7 @@ impl Processor {
                 pda_account.clone(),
                 token_program.clone(),
             ],
-            &[&[&b"escrow"[..], &[nonce]]],
+            &[&[&b"escrow"[..], &[bump_seed]]],
         )?;
 
         let close_pdas_temp_acc_ix = spl_token::instruction::close_account(
@@ -197,7 +197,7 @@ impl Processor {
                 pda_account.clone(),
                 token_program.clone(),
             ],
-            &[&[&b"escrow"[..], &[nonce]]],
+            &[&[&b"escrow"[..], &[bump_seed]]],
         )?;
 
         msg!("Closing the escrow account...");

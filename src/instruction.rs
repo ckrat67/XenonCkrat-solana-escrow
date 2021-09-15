@@ -20,7 +20,7 @@ pub enum EscrowInstruction {
     InitEscrow {
         /// The amount party A expects to receive of token Y
         amount: u64
-    }
+    },
 
     /// Accepts a trade
     ///
@@ -39,7 +39,7 @@ pub enum EscrowInstruction {
     Exchange {
         /// the amount the taker expects to be paid in the other token, as a u64 because that's the max possible supply of a token
         amount: u64,
-    }
+    },
 }
 
 impl EscrowInstruction {
