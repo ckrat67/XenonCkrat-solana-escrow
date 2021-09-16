@@ -10,6 +10,8 @@ use solana_program::{
 };
 
 use spl_token::state::Account as TokenAccount;
+#[allow(unused_imports)]
+use spl_token::state::Mint as MintAccount;
 
 use crate::{error::EscrowError, instruction::EscrowInstruction, state::Escrow};
 
@@ -48,8 +50,29 @@ impl Processor {
 		if *token_to_receive_account.owner != spl_token::id() {
 			return Err(ProgramError::IncorrectProgramId);
 		}
-		// include a check that the relevant 'token_to_receive_account' is a token account rather than a token mint account
 
+		// include a check that the relevant 'token_to_receive_account' is a token account rather than a token mint account
+		fn check_if_mint(accnt: &AccountInfo) -> Option<bool> {
+			if accnt.data_len() > 3 {
+				Some(true)
+			} else {
+				None
+			}
+		}
+
+		fn try_check(accnt: &AccountInfo) -> u8 {
+			match check_if_mint(accnt) {
+				None => 1,
+				Some(_boolean) => {
+					2
+				},
+			}
+		}
+
+		let result_of_try_check = try_check(token_to_receive_account);
+		if result_of_try_check == 1 {
+			return Err(ProgramError::InvalidAccountData);
+		}
 
 		let escrow_account = next_account_info(account_info_iter)?;
 		let rent = &Rent::from_account_info(next_account_info(account_info_iter)?)?;
